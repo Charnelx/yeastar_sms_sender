@@ -34,6 +34,7 @@ class GSMGateway(QtCore.QThread):
         reader, writer = self.loop.run_until_complete(self.login(self.loop))
         self.loop.run_until_complete(self.sendSMS(reader, writer))
 
+    # Login into GSM gateway SMS system
     @asyncio.coroutine
     def login(self, loop):
 
@@ -59,6 +60,7 @@ class GSMGateway(QtCore.QThread):
         self.emit(QtCore.SIGNAL("response(PyQt_PyObject)"), (stage,response))
         return reader, writer
 
+    # Sending SMS to specified number
     @asyncio.coroutine
     def sendSMS(self, reader, writer):
         for number in self.numbers:
@@ -76,19 +78,16 @@ class GSMGateway(QtCore.QThread):
             self.num_id = str(int(self.num_id)+1)
             stage = 2
             response += 'Number: %s' % number
-            print(response)
             self.emit(QtCore.SIGNAL("response(PyQt_PyObject)"), (stage,response))
 
     def readResponse(self, reader):
-        print('Read response')
-        print(reader)
         while True:
             data = yield from reader.readline()
             if data == b'\r\n':
                 break
-            # print(data.decode())
         return data.decode()
 
+# Preferences GUI class
 class Preferences(QtGui.QMainWindow, Ui_PrefWindow):
 
     def __init__(self, config):
@@ -165,6 +164,7 @@ class Preferences(QtGui.QMainWindow, Ui_PrefWindow):
         }
         self.initilize()
 
+# Main GUI form
 class MainFrame(QtGui.QMainWindow, Ui_MainWindow):
 
     def __init__(self, loop, config):
